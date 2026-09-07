@@ -1,7 +1,7 @@
 ##### This is my first script. I am learning how to import data #####
 ##### Created by Timothy Li #####
 ##### Created on 2026-09-07 #####
-#################################################################
+##################################################################
 
 ##### Load Libraries ##### 
 library(tidyverse)
