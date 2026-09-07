@@ -1,4 +1,4 @@
-# Li 
+<img width="4284" height="5712" alt="IMG_8555" src="https://github.com/user-attachments/assets/951c393f-6ac8-41a8-82b1-5643da54aae0" /># Li 
 ## Repository for OCN 682/MBIO 612 Data Science Fundamentals in R 
 **Contents**
 
@@ -14,5 +14,6 @@
 
 My name is Timothy Li and I'm a 2nd year Masters student in Natural Resource and Environmental Management. I use RStudio as a part of my research studying cost-effective monitoring techniques for rice product in Hawai'i!
 
-![Rice Plant](https://www.hawaii.edu/news/2026/07/26/hawaii-grow-rice/)
+![Rice Plant](Uploading IMG_8555.jpg…)
+
 
