@@ -14,5 +14,5 @@
 
 My name is Timothy Li and I'm a 2nd year Masters student in Natural Resource and Environmental Management. I use RStudio as a part of my research studying cost-effective monitoring techniques for rice product in Hawai'i!
 
-![Rice Plant](/Users/timoli/Desktop/IMG_8555.HEIC)
+![Rice Plant](/Users/timoli/Desktop/IMG_8555.jpg)
 
