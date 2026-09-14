@@ -10,16 +10,20 @@ library(palmerspenguins)
 
 ##### Read in my data #####
 
+# Installed from the palmerspenguin package
 penguins
 
 
 ##### Clean up the data #####
 
+# Eliminating NA values for my Boxplot
 penguins_clean <- penguins[!is.na(penguins$sex), ]
 
 ##### Plotting the data #####
 
-ggplot(data = penguins_clean,
+# The colors chosen are from Okabe-Ito Palette --> Used for colorblind-safe data visualization
+
+plot1 <- ggplot(data = penguins_clean,
        mapping = aes(x = sex, 
                      y = flipper_length_mm,
                      color = sex)) + 
@@ -43,6 +47,14 @@ ggplot(data = penguins_clean,
     strip.text = element_text(size = 12, face = "bold"),
     legend.title = element_text(face = "bold")
   )
+
+plot1
+
+##### Saving my Plot #####
+
+ggsave(here("week_03", "output", "FlipperPenguin.png"), width = 8)
+
+
 
 
 
