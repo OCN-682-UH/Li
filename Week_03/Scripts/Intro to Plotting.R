@@ -3,10 +3,12 @@
 ##### Created on 2026-09-13 #####
 ###################################################
 
+
 ##### Load Libraries #####
 library(tidyverse)
 library(here)
 library(palmerspenguins)
+
 
 ##### Read in my data #####
 
@@ -19,8 +21,8 @@ penguins
 # Eliminating NA values for my Boxplot
 penguins_clean <- penguins[!is.na(penguins$sex), ]
 
-##### Plotting the data #####
 
+##### Plotting the data #####
 # The colors chosen are from Okabe-Ito Palette --> Used for colorblind-safe data visualization
 
 plot1 <- ggplot(data = penguins_clean,
@@ -50,7 +52,9 @@ plot1 <- ggplot(data = penguins_clean,
 
 plot1
 
+
 ##### Saving my Plot #####
+
 
 ggsave(here("week_03", "output", "FlipperPenguin.png"), width = 8)
 
