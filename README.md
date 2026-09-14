@@ -8,7 +8,7 @@
   * Scripts - Introscript.R
   * Outcome - N/A
 
-* [Week 03](Week 03)
+* [Week 03]
   * Data - N/A
   * Scripts - Intro to Plotting.R
   * Outcome - FlipperPenguins.png
