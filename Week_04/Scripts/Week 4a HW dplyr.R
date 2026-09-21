@@ -1,15 +1,17 @@
-##### This is my code for the dplyr assignment #####
+##### This is my code for the dplyr assignment looking at the Log Body Mass of Female penguins#####
 ##### Created by Timothy Li #####
-##### Created on: 2026-09-19 #####
+##### Updated on: 2026-09-21 #####
 
 
 ##### Load Libraries #####
+
 library(palmerpenguins)
 library(tidyverse)
 library(here)
 
 
 ### Load Data ###
+
 # The data is part of the package and is called penguins 
 glimpse(penguins)
 
@@ -17,24 +19,27 @@ glimpse(penguins)
 ##### Calculating the Mean and Variance of Body Mass by Species #####
 
 mean_variance_penguin <- penguins |>
-  drop_na(body_mass_g, species, island, sex) |>
+  drop_na(body_mass_g, species, island, sex) |> # Dropping NA in these columns
   group_by(species, island, sex) |>
   summarise(mean_body_mass = mean(body_mass_g, na.rm = TRUE),
             var_body_mass = var(body_mass_g, na.rm = TRUE))
 
 mean_variance_penguin
 
+
 ##### Calculate Female log Body Mass #####
 
 female_penguins <- penguins |>
   drop_na(sex) |>
   filter(sex == "female") |>
-  mutate(log_body_mass = log(body_mass_g)) |>
+  mutate(log_body_mass = log(body_mass_g)) |>  # Adding a log body mass column
   select(species, island, sex, log_body_mass)
 
 female_penguins
+
   
 ##### Plotting the Data. #####
+
 
 # Color filled by species 
 # Expand function used to align bins directly on x axis. .1 space for top of graph
@@ -67,9 +72,10 @@ plot_log_penguins <- ggplot(data = female_penguins,
 
 plot_log_penguins
 
+
 ##### Save the Plot #####
 
-ggsave(here("week_04", "output", "LogBodyMassPenguin.png"), width = 10)
+ggsave(here("week_04", "output", "HW4a_LogBodyMassPenguin.png"), width = 10)
 
 
 
