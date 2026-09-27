@@ -30,7 +30,6 @@ date_cond_data <- cond_data |>
               mean_depth = mean(Depth, na.rm = TRUE),
               "Avg Temperature" = mean(Temperature, na.rm = TRUE), # Column names to be Avg Temp / Salinity instead of mean_temp / mean_sal
               "Avg Salinity" = mean(Salinity, na.rm = TRUE)) |>    # I did this so facets will have these titles
-  filter("Avg Salinity" >= 30) |>
   pivot_longer(cols = c("Avg Temperature", "Avg Salinity"), # Made it long data for easier graphing
                names_to = "Measurement",
                values_to = "Values")
