@@ -1,4 +1,4 @@
-##### This is my Join and Dates Assignment  #####
+##### This is my Join and Dates Assignment Looking at Salinity and Temperature across Depth Gradients #####
 ##### Created by Timothy Li #####
 ##### Created on 2026-09-25 #####
 
@@ -22,16 +22,16 @@ glimpse(depth_data)
 
 date_cond_data <- cond_data |>
   mutate(date = mdy_hms(date)) |>
-  mutate(date = with_tz(date, tzone = "US/Hawaii")) |>
-  mutate(date = round_date(date, "10 seconds")) |>
+  mutate(date = with_tz(date, tzone = "US/Hawaii")) |> # Making sure time zone is HST
+  mutate(date = round_date(date, "10 seconds")) |> # Rounding to 10 seconds to prep for join
   inner_join(depth_data) |>
-  group_by(min_date = round_date(date, "minute")) |>
+  group_by(min_date = round_date(date, "minute")) |> # Round to minute for summaries 
     summarise(mean_date = mean(date, na.rm = TRUE),
               mean_depth = mean(Depth, na.rm = TRUE),
-              mean_temp = mean(Temperature, na.rm = TRUE),
-              mean_salinity = mean(Salinity, na.rm = TRUE)) |>
-  filter(mean_salinity >= 30) |>
-  pivot_longer(cols = c(mean_temp, mean_salinity),
+              "Avg Temperature" = mean(Temperature, na.rm = TRUE), # Column names to be Avg Temp / Salinity instead of mean_temp / mean_sal
+              "Avg Salinity" = mean(Salinity, na.rm = TRUE)) |>    # I did this so facets will have these titles
+  filter("Avg Salinity" >= 30) |>
+  pivot_longer(cols = c("Avg Temperature", "Avg Salinity"), # Made it long data for easier graphing
                names_to = "Measurement",
                values_to = "Values")
 
@@ -45,14 +45,13 @@ depth_temp_sal_plot <- ggplot(data = date_cond_data,
                                          shape = Measurement,
                                         )) +
   geom_point(size = 2, color = "black", alpha = .75) +
-  geom_smooth(method = "gam", linewidth = .5, color = "#56B4E9", alpha = .5) +
-  facet_wrap(~ Measurement, nrow = 1, scales = "free_x") +
-  scale_fill_viridis_d(option = "plasma") +
-  scale_y_reverse() +
+  geom_smooth(method = "gam", linewidth = .5, color = "#D55E00", alpha = .3) + # Color friendly Red/Orange 
+  facet_wrap(~ Measurement, nrow = 1, scales = "free_x") + # Free_x is used to give each graph their own X axis values (Individual scales)
+  scale_fill_viridis_d() +
+  scale_y_reverse() + # Makes more sense to have depth be descending (0 at top down by .1 meters) 
   scale_x_continuous() +
   labs(title = "Salinity and Temperature Profiles Across Depth Gradients",
       x = "Measurement Value", y = "Depth (m)",
-      caption = ""
   ) +
   theme_bw() +
   theme(
@@ -66,7 +65,9 @@ depth_temp_sal_plot <- ggplot(data = date_cond_data,
 
 depth_temp_sal_plot
 
+##### Save the Plot ##### 
 
+ggsave(here("Week_05", "Outputs", "HW5_Temp_Sal_Depth.png"), width = 10, height = 8)
   
 
 
