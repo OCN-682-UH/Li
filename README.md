@@ -13,6 +13,9 @@
   * Scripts - Intro to Plotting.R
   * Outcome - FlipperPenguins.png
 
+* [Week 06](Week_06)
+  * 
+
 **About Me**
 
 My name is Timothy Li and I'm a 2nd year Masters student in Natural Resources and Environmental Management. I use RStudio as a part of my research studying cost-effective monitoring techniques for rice production in Hawai'i!
