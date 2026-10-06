@@ -1,12 +1,12 @@
 ---
 title: "Week 06 Quarto Homework"
 author: "Timothy Li"
-format: 
+date: "`r Sys.Date()`"
+format:
   html:
     code-fold: true
-    code-summary: "Show Code"
+    code-summary: Show Code
     embed-resources: true
-date: "`r Sys.Date()`"
 editor: visual
 execute:
   warning: false
@@ -30,7 +30,6 @@ library(kableExtra)
 
 ChemData <- read_csv(here("Week_06", "Data", "chemicaldata_maunalua.csv"))
 glimpse(ChemData)
-
 ```
 
 ### The second step is cleaning up the data!
@@ -88,6 +87,10 @@ phosphate_silicate_plot <- ggplot(data = ChemData_clean,
   )
 
 phosphate_silicate_plot
+
+##### Save Plot
+
+ggsave(here("Week_06", "Outputs", "HW6_Phos_Sil_plot.png"), width = 10, height = 6)
 ```
 
 ### The final step is identifying some important takeaways from the plots. I also want to make a table of the important summary statistics to identify some of these takeaways much easier!

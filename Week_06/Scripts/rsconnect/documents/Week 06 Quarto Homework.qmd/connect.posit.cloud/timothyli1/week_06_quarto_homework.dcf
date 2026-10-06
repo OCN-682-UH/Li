@@ -1,0 +1,12 @@
+name: week_06_quarto_homework
+title: Week 06 Quarto Homework
+username: timothyli1
+account: timothyli1
+server: connect.posit.cloud
+hostUrl: https://api.connect.posit.cloud/v1
+appId: 01a1128a-7987-20db-3f9e-c52c420154b1
+bundleId:
+url: https://connect.posit.cloud/timothyli1/content/01a1128a-7987-20db-3f9e-c52c420154b1
+version: 1
+asMultiple: FALSE
+asStatic: TRUE
