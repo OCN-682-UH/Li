@@ -1,0 +1,135 @@
+---
+title: "Week 06 Quarto Homework"
+author: "Timothy Li"
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show Code"
+    embed-resources: true
+date: "`r Sys.Date()`"
+editor: visual
+execute:
+  warning: false
+  message: false
+  eval: true
+theme: zephyr
+---
+
+# I'm creating a **plot** and **table** with the Chemistry Data set from Silbiger et al. 2020
+
+### The first step is loading the libraries and reading in the data
+
+```{r}
+### Load in Libraries #####
+
+library(tidyverse)
+library(here)
+library(kableExtra)
+
+##### Read in Data #####
+
+ChemData <- read_csv(here("Week_06", "Data", "chemicaldata_maunalua.csv"))
+glimpse(ChemData)
+
+```
+
+### The second step is cleaning up the data!
+
+```{r}
+##### Clean Data ##### 
+
+ChemData_clean <- ChemData |>
+  drop_na() |>            # Remove all NAs
+  separate_wider_delim(cols  = Tide_time, # Separate the Tide_time column into 2 separate columns
+                       delim = "_",
+                       names = c("Tide", "Time"))
+
+glimpse(ChemData_clean)
+```
+
+### The third step is determining what we want to plot and plotting it! I'm choosing to focus on the relationship between *Phosphate* and *Silicate* concentrations in reference to what *Season* it is and what *Time* of day it is.
+
+```{r}
+#| label: fig-phosphate-silicate
+#| fig-cap: "The Relationship Between Silicate Concentrations (ppm) and Phosphate Concentrations (ppm) During Different Seasons at Day and Night"
+#| fig-cap-location: bottom
+#| out-width: "90%"
+#| fig-width: 10
+#| fig-height: 6
+#| fig-align: "center"
+
+phosphate_silicate_plot <- ggplot(data = ChemData_clean,
+                           mapping = aes(x = Silicate,
+                                         y = Phosphate,
+                                         color = interaction(Season, Time) # Interaction lets me have separate colors for each grided plot
+                                         )) +
+  geom_point(size = 1, alpha = 0.5) +
+  facet_grid(Time ~ Season, # Grid separated by time and season (4 total plots)
+             labeller = labeller(
+               Season = c("FALL" = "Fall", "SPRING" = "Spring"), # Labeller changes the label names 
+               Time = c("Day" = "Daytime", "Night" = "Nighttime")
+             ))  + 
+  scale_fill_viridis_d(option = "D") + # Color-blind friendly scale
+  geom_smooth(method = "lm", linewidth = .75, color = "grey30") +     
+  labs(
+       x = "Silicate Concentration (ppm)", y = "Phosphate Concentration (ppm)",
+       caption = "Silbiger et al. 2020 Proceedings of the Royal Society: B"
+  ) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(size = 13, hjust = .5, face = "bold"),
+    axis.title.x = element_text(size = 10, face = "bold"),
+    axis.title.y = element_text(size = 10, face = "bold"),
+    plot.caption = element_text(size = 5),
+    strip.text = element_text(size = 10, face = "bold"),
+    axis.text.x = element_text(size = 7),
+    axis.text.y = element_text(size = 7),
+    legend.position = "none"
+  )
+
+phosphate_silicate_plot
+```
+
+### The final step is identifying some important takeaways from the plots. I also want to make a table of the important summary statistics to identify some of these takeaways much easier!
+
+```{r}
+#| label: tbl-phosphate-silicate
+#| tbl-cap: "Summary Statistics for Phosphate (ppm) and Silicate (ppm) Concentrations"
+#| tbl-cap-location: bottom
+
+##### Pivot into long format and Calculate Summary Statistics #####
+
+ChemData_summary <- ChemData_clean |>
+  pivot_longer(cols = Phosphate:Silicate, # Making the dataset longer
+               names_to  = "Variables",         
+               values_to = "Values") |>
+  group_by(Season, Time, Variables) |> # Summarizing for Variable and Zone
+  summarise(Mean = mean(Values, na.rm = TRUE),
+            Variability  = var(Values,  na.rm = TRUE),
+            "Standard Deviation" = sd(Values, na.rm = TRUE)) |> # Finding mean, variability, and SD
+  write_csv(here("Week_06", "Outputs", "HW06_summary.csv")) |>
+  kbl() |> # Creates the table
+  kable_classic() |> # Table theme
+  kable_styling(full_width = FALSE) # Makes sure the table isn't too wide
+
+ChemData_summary
+
+```
+
+### Key Takeaways from the plots and summary statistics:
+
+- All 4 plots have relatively strong and positive correlations
+
+- Points are heavily concentrated at lower levels of Phosphate and Silicate
+
+- Daytime in the Spring and Nightime in the Fall have Silicate concentrations above 150 ppm
+
+  - These could potentially be outliers which could be tested using IQR
+
+- Daytime in Spring has the highest mean Silicate and Phosphate concentrations (ppm)
+
+- `r max(ChemData_clean$Silicate)` is the max Silicate concentration (ppm)
+
+- `r max(ChemData_clean$Phosphate)` is the max Phosphate concentration (ppm)
+
+### That is all. Thanks!

@@ -1,0 +1,24 @@
+---
+title: "My First Quarto Doc"
+author: "Timothy Li"
+format: html
+editor: visual
+---
+
+### My Document
+
+```{r}
+library(palmerpenguins)
+library(tidyverse)
+library(here)
+
+```
+
+This data set has `r levels(penguins$sex)`. The speces
+
+```{r}
+glimpse(penguins)
+bill <- round(mean(penguins$bill_length_mm, na.rm = TRUE), 1)
+```
+
+This data set has a mean bill length (mm) of `r bill`
