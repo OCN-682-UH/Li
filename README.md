@@ -14,7 +14,7 @@
   * Outcome - FlipperPenguins.png
 
 * [Week 06](Week_06)
-  * 
+  [Quarto Homework](https://01a1128a-7987-20db-3f9e-c52c420154b1.share.connect.posit.cloud)
 
 **About Me**
 
