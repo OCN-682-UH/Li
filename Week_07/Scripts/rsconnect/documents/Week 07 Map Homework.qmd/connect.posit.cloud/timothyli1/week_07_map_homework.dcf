@@ -1,0 +1,12 @@
+name: week_07_map_homework
+title: Week 07 Map Homework
+username: timothyli1
+account: timothyli1
+server: connect.posit.cloud
+hostUrl: https://api.connect.posit.cloud/v1
+appId: 01a13674-916d-18d1-5b3f-cdcd42e34e28
+bundleId:
+url: https://connect.posit.cloud/timothyli1/content/01a13674-916d-18d1-5b3f-cdcd42e34e28
+version: 1
+asMultiple: FALSE
+asStatic: TRUE

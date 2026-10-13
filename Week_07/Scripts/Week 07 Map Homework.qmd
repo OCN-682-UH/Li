@@ -1,0 +1,226 @@
+---
+title: "Week 07 HW Mapping"
+author: "Timothy Li"
+date: "`r Sys.Date()`"
+format:
+  html:
+    code-fold: true
+    code-summary: Show Code
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  eval: true
+theme: superhero
+---
+
+# For this week, I am making a map of where Bigfoot has been spotted across the United States.
+
+### The first step in creating this map is loading in the libraries
+
+```{r}
+##### Load libraries #####
+
+library(tidyverse)
+library(here)
+library(maps)
+library(mapdata)
+library(mapproj)
+```
+
+### The second step is reading in our Bigfoot and States data
+
+```{r}
+##### Read in Data #####
+
+bigfoot <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2022/2022-09-13/bigfoot.csv')
+
+states <- map_data("state")
+head(states)
+```
+
+This Bigfoot data comes from the *Bigfoot Field Research Organization*! It includes descriptions of reported sightings, the details of the location Bigfoot was spotted in, the season and temperature, and many more variables.
+
+This States data comes from the maps package we downloaded earlier. Reading this in sets us up to create a map with the Bigfoot data as well.
+
+### The fourth step is cleaning up our Bigfoot data
+
+```{r}
+no_NA_bigfoot <- bigfoot |>
+  drop_na() |> # Drop NA values
+  filter(longitude > -130) # Only give me longitude > -130
+```
+
+In the initial Bigfoot data set, there are a lot of entries filled with an NA. For the sake of this map, I only want entries where there are no NA's, meaning that whoever reported the sighting was able to account for all the information regarding Bigfoot and the environment. I also filtered for longitude greater than -130 because some points were in the middle of the ocean and we don't want those either.
+
+### Step five is create a map of the US with the Bigfoot and States data
+
+```{r}
+#| label: fig-map-bigfoot
+#| fig-cap: "Reported Bigfoot Sightings Across the United States"
+#| fig-cap-location: bottom
+#| out-width: "100%"
+#| fig-width: 12
+#| fig-height: 7
+#| fig-align: "center"
+
+ggplot() +
+  geom_polygon(data = states, # Creates the map of the US
+               aes(x = long, y = lat,
+                   group = group,
+                   fill = region), # Each state is a different color
+               color = "black") +
+  geom_point(data = no_NA_bigfoot,
+             aes(x = longitude, y = latitude)) +
+  labs(
+    x = "Longitude (°)", y = "Latitude (°)",
+    caption = "Bigfoot Field Research Organization") + # Where our bigfoot data is from
+  theme_minimal() +
+  guides(fill = "none") +
+  theme(panel.background =
+          element_rect(fill = "lightblue")) +
+  coord_map(projection = "mercator") # Set coordinate system
+```
+
+In this initial map, each state is colored so that it is easier to differentiate them between one another. Each black point on the map represents one reported sighting of Bigfoot where the reporter could track every variable.
+
+### Step six is adjusting the map to reflect the density of reported sightings per state
+
+```{r}
+sighting_counts <- no_NA_bigfoot |>
+  count(state, name = "sightings") |> # Creates column in new dataframe for count of sightings for each state
+  mutate(state = tolower(state)) # Changes to lowercase to match with States data for join
+
+```
+
+After creating that new dataframe, I joined with the states to create another dataframe that has all the states initial data with the count of sightings for each state.
+
+```{r}
+states_count <- states |>
+  left_join(sighting_counts, by = c("region" = "state")) |> # Left join - Match 2nd data to 1st for region and state columbs
+  mutate(sightings = replace_na(sightings, 0)) # For values that are NA, make it 0 count instead 
+```
+
+### The seventh and final step is plotting the states_count and no_NA_Bigfoot data
+
+```{r}
+#| label: fig-map-gradient
+#| fig-cap: "Reported Bigfoot Sightings Across the United States"
+#| fig-cap-location: bottom
+#| out-width: "100%"
+#| fig-width: 12
+#| fig-height: 7
+#| fig-align: "center"
+
+ggplot() +
+  geom_polygon(data = states_count,
+               aes(x = long, y = lat,
+                   group = group,
+                   fill = sightings), # Adjust state colors by count of sightings 
+               color = "black") +
+  geom_point(data = no_NA_bigfoot,
+             aes(x = longitude, y = latitude),
+             color = "darkgreen", size = .25, alpha = 1) +
+  scale_fill_gradient(low = "white", high = "#5C4033") + # Darker brown means higher density of sightings
+  labs(
+    x = "Longitude (°)", y = "Latitude (°)",
+    caption = "Bigfoot Field Research Organization",
+    fill = "Sightings" # Change legend title
+  ) +
+  theme_minimal() +
+  theme(panel.background =
+          element_rect(fill = "lightblue")) +
+  coord_map(projection = "mercator")
+
+ggsave(here("Week_07", "Outputs", "HW7_Bigfoot_Sighting.png"), width = 10, height = 6)
+```
+
+You'll notice as the density of green dots increases within a state, the darker in color the state is. From this map, you can tell that Washington has the most amount of reported sightings without having to count each green dot. The second most is Ohio!
+
+You can also see that there are three states in which there are no reported sightings. Those states are Nevada, Wyoming, and South Dakota. I would not recommend visiting those places if you are trying to catch a glimpse of Bigfoot!
+
+Out of curiosity though, I wanted to take a closer look at California being that is where I'm from. I decided to play around with the leaflet package to get a topographic map of California with interactive markers.
+
+#### The first thing I did here was load the libraries needed for an interactive map
+
+```{r}
+##### Load libraries #####
+
+library(maptiles)
+library(tidyterra)
+library(leaflet)
+library(tidygeocoder)
+library(ggspatial)
+```
+
+#### The second thing I did here is filter for just California for both the states and no NA Bigfoot dataframes
+
+```{r}
+CA_data <- states |>
+  filter(region == "california")
+
+CA_bigfoot <- no_NA_bigfoot |>
+  filter(state == "California")
+```
+
+#### The next step was plotting those data points just in California
+
+```{r}
+#| label: fig-cali-bigfoot1
+#| fig-cap: "Reported Bigfoot Sightings in California"
+#| fig-cap-location: bottom
+#| out-width: "100%"
+#| fig-width: 7
+#| fig-height: 7
+#| fig-align: "center"
+
+ggplot() +
+  geom_polygon(data = CA_data,
+               aes(x = long, y = lat,
+                   group = group),
+               fill = "grey", # Color of California
+               color = "black") +
+  geom_point(data = CA_bigfoot,
+             aes(x = longitude, y = latitude),
+             color = "darkgreen", size = 1, alpha = 1) +
+  labs(
+    x = "Longitude (°)", y = "Latitude (°)",
+    caption = "Bigfoot Field Research Organization") +
+  theme_minimal() + # Minimal theme
+  theme(panel.background =
+          element_rect(fill = "lightblue")) +
+  coord_map(projection = "mercator") # Set coordinate plane for California
+```
+
+#### And finally it was using leaflet to plot this map of California!
+
+```{r}
+#| label: fig-cali-bigfoot2
+#| fig-cap: "Reported Bigfoot Sightings in California"
+#| fig-cap-location: bottom
+#| out-width: "90%"
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: "center"
+
+leaflet() |>
+  addProviderTiles("Esri.WorldTopoMap") |> # Provides the map and makes interactive
+  addPolygons(
+    data = CA_data, lng = ~long, lat = ~lat, 
+    fillOpacity = 0.1, # How dark the fill is in California 
+    color = "black",
+    weight = 1
+  ) |>
+  addCircleMarkers( # Able to click on the markers and makes interactive
+    data = CA_bigfoot, lng = ~longitude, lat = ~latitude,
+    radius = 4, color = "darkgreen", fillOpacity = 1,
+    popup = ~observed # This is what pops up when you click the dots
+  )
+```
+
+One thing you may notice is that when you click on each point, it provides you the description of the observation. Pretty cool!
+
+# 
+
+### That is all! Thanks for viewing.

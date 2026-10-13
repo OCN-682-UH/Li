@@ -1,0 +1,128 @@
+---
+title: "Week 07 Mapping Quarto Practice"
+author: "Timothy Li"
+format: html
+editor: visual
+---
+
+```{r}
+##### Load Libraries #####
+
+library(tidyverse)
+library(here)
+library(maps)
+library(mapdata)
+library(mapproj)
+
+```
+
+You can add options to executable code like this
+
+```{r}
+##### Read in Data ##### 
+
+# Population in California by county
+popdata <- read_csv(here("Week_07", "data", "CApopdata.csv"))
+
+# Seastar counts at field sites in California
+stars <- read_csv(here("Week_07", "data", "stars.csv"))
+```
+
+Data frames for parts of data
+
+```{r}
+world <- map_data("world")
+
+head(world)
+
+usa <- map_data("usa")
+
+head(usa)
+
+states <- map_data("state")
+
+head(states)
+
+counties <- map_data("county")
+
+head(counties)
+```
+
+Map of world below
+
+```{r}
+ggplot() +
+  geom_polygon(data = world,
+               aes(x = long, y = lat,
+                   group = group,
+                   fill = region),
+               color = "black") +
+  theme_minimal() +
+  guides(fill = "none") +
+  theme(panel.background =
+          element_rect(fill = "lightblue")) +
+          coord_map(projection = "sinusoidal",
+                    xlim = c(-180, 180))
+```
+
+Map of California
+
+```{r}
+CA_data <- states |>
+  filter(region == "california")
+
+ggplot() +
+  geom_polygon(data = CA_data,
+               aes(x = long, y = lat,
+                   group = group),
+               fill = "blue") +
+  coord_map() 
+
+```
+
+Joined table for california counties
+
+```{r}
+CApop_county <- popdata |>
+  select("subregion" = County, Population) |>   # rename to match counties
+  inner_join(counties) |>
+  filter(region == "california") 
+
+head(CApop_county)
+```
+
+Map of California colored by population of each county
+
+```{r}
+ggplot() +
+  geom_polygon(data = CApop_county,
+               aes(x = long, y = lat,
+                   group = group,
+                   fill = Population),
+               color = "black") +
+  geom_point(data = stars,
+             aes(x = long, y = lat,
+                 size = star_no)) +
+  coord_map() +
+  theme_void() +
+  scale_fill_gradient(transform = "log10") +
+  labs(size = "# stars/m²")
+
+ggsave(here("Week_07", "Outputs", "CApop.pdf"))
+```
+
+Practice with SF
+
+```{r}
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+world_sf <- ne_countries(scale = "medium",
+                         returnclass = "sf")
+
+ggplot(world_sf) +
+  geom_sf(fill = "lightgray",
+          color = "white") +
+  theme_void()
+```
