@@ -17,6 +17,10 @@
 
 [Quarto Homework](https://01a1128a-7987-20db-3f9e-c52c420154b1.share.connect.posit.cloud)
 
+* [Week 07](Week_07)
+
+[Quarto Homework](https://01a13674-916d-18d1-5b3f-cdcd42e34e28.share.connect.posit.cloud)
+
 **About Me**
 
 My name is Timothy Li and I'm a 2nd year Masters student in Natural Resources and Environmental Management. I use RStudio as a part of my research studying cost-effective monitoring techniques for rice production in Hawai'i!
