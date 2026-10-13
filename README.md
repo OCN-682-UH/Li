@@ -19,7 +19,7 @@
 
 * [Week 07](Week_07)
 
-[Quarto Homework](https://01a13674-916d-18d1-5b3f-cdcd42e34e28.share.connect.posit.cloud)
+[Mapping Homework](https://01a13674-916d-18d1-5b3f-cdcd42e34e28.share.connect.posit.cloud)
 
 **About Me**
 
