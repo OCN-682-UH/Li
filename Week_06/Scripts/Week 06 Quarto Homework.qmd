@@ -24,7 +24,6 @@ theme: zephyr
 
 library(tidyverse)
 library(here)
-library(kableExtra)
 
 ##### Read in Data #####
 

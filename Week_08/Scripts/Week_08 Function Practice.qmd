@@ -1,0 +1,145 @@
+---
+title: "Week_08 Function Practice"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(ggplot)
+
+```
+
+You can add options to executable code like this
+
+```{r}
+df <- tibble(
+  a = rnorm(10),
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+
+head(df)
+```
+
+```{r}
+df <- df |>
+  mutate(
+    a = (a - min(a, na.rm = TRUE)) / (max(a, na.rm = TRUE) - min(a, na.rm = TRUE)),
+    b = (b - min(b, na.rm = TRUE)) / (max(b, na.rm = TRUE) - min(b, na.rm = TRUE)),
+    c = (c - min(c, na.rm = TRUE)) / (max(c, na.rm = TRUE) - min(c, na.rm = TRUE)),
+    d = (d - min(d, na.rm = TRUE)) / (max(d, na.rm = TRUE) - min(d, na.rm = TRUE))
+  )
+
+head(df)
+```
+
+Writing a function
+
+```{r}
+rescale01 <- function(x) {
+  value <- (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+  return(value)
+}
+
+df |>
+  mutate(
+    a = rescale01(a),
+    b = rescale01(b),
+    c = rescale01(c),
+    d = rescale01(d)
+  )
+```
+
+Even better
+
+```{r}
+df |>
+  mutate(across(everything(), rescale01))
+```
+
+Celsius to Kelvin Example
+
+```{r}
+C_to_kelvin <- function(temp_c) {
+  temp_k <- (temp_c + 273.15)
+  return(temp_k)
+}
+
+C_to_kelvin(3)
+```
+
+Plot Functions
+
+```{r}
+library(palmerpenguins)
+library(PNWColors)
+
+pal <- pnw_palette("Lake", 3, type = "discrete")
+
+ggplot(penguins, aes(x = body_mass_g, y = bill_length_mm, color = island)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  scale_color_manual("Island", values = pal) +
+  theme_bw()
+
+
+```
+
+```{r}
+myplot <- function(data, x, y) {
+  pal <- pnw_palette("Lake", 3, type = "discrete")
+  
+  ggplot(data, aes(x = {{x}}, y = {{y}}, color = island)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual("Island", values = pal) +
+    theme_bw()
+}
+
+myplot(data = penguins, x = body_mass_g, y = flipper_length_mm)
+
+myplot(data = penguins, x = body_mass_g, y = flipper_length_mm) +
+  labs(x = "Body mass (g)", y = "Flipper length (mm)")
+```
+
+If else statements
+
+```{r}
+a <- 4
+b <- 5
+
+if (a > b) {
+  f <- 9
+} else {
+  f <- 10
+}
+
+f
+```
+
+Making your function more flexible
+
+```{r}
+myplot <- function(data = penguins, x, y, lines = TRUE) {
+  pal <- pnw_palette("Lake", 3, type = "discrete")
+  
+  if (lines == TRUE) {
+    ggplot(data, aes(x = {{x}}, y = {{y}}, color = island)) +
+      geom_point() +
+      geom_smooth(method = "lm") +
+      scale_color_manual("Island", values = pal) +
+      theme_bw()
+  } else {
+    ggplot(data, aes(x = {{x}}, y = {{y}}, color = island)) +
+      geom_point() +
+      scale_color_manual("Island", values = pal) +
+      theme_bw()
+  }
+}
+
+myplot(x = body_mass_g, y = flipper_length_mm, lines = FALSE)
+
+```
