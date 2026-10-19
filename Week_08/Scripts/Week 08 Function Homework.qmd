@@ -118,6 +118,7 @@ my_plot(x = hourly_wage_gbp, y = price_gbp, lines = TRUE) +
     axis.text.y = element_text(size = 11),
   )
 
+ggsave(here("Week_08", "Outputs", "HW08-fig-coffee-GBP.png"), width = 10, height = 6)
 ```
 
 ##### Example
@@ -142,7 +143,7 @@ my_plot(x = hourly_wage, y = price, lines = TRUE) +
     axis.text.y = element_text(size = 11),
   )
 
-
+ggsave(here("Week_08", "Outputs", "HW08-fig-coffee-USD.png"), width = 10, height = 6)
 ```
 
 As you can see, there is a relatively weak positive relationship between the two. I'd expect that in places where the hourly wage is higher, the price of a small cappuccino would be higher. That's kind of what we see.
