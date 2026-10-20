@@ -39,6 +39,9 @@ cappuccino_index = read_csv("https://raw.githubusercontent.com/rfordatascience/t
 
 head(cafe)
 head(cappuccino_index)
+
+write_csv(cafe, here("Week_08", "Data", "cafe.csv"))
+write_csv(cappuccino_index, here("Week_08", "Data", "cappuccino_inxex.csv"))
 ```
 
 ### The third step is cleaning up the data for only US cafes.
