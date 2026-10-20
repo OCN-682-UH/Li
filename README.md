@@ -3,6 +3,8 @@
 
 **Contents**
 
+* [Goodplot-Badplot](https://01a15aa1-be45-b350-f2ce-bc4135f39c57.share.connect.posit.cloud)
+
 * [Week 02](Week_02)
   * Data - weightdata.csv
   * Scripts - Introscript.R
