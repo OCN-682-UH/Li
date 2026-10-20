@@ -1,0 +1,270 @@
+---
+title: "Good Plot / Bad Plot"
+author: "Timothy Li"
+date: "`r Sys.Date()`"
+format:
+  html:
+    code-fold: true
+    code-summary: Show Code
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  eval: true
+theme: cosmo
+---
+
+# For this assignment, I'm creating an awful plot and a pretty good one using data on collegiate sports budgets
+
+### The first step is always loading in our libraries!
+
+```{r}
+##### Load Libraries #####
+
+library(tidyverse)
+library(here)
+library(scales)
+```
+
+### The second step is reading in our data
+
+For this assignment, I chose the Collegiate Sports Budgets from Equity in Athletics Data Analysis. NPR wrote an article about this. Cool!
+
+```{r}
+##### Read in Data #####
+sports <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2022/2022-03-29/sports.csv')
+
+write_csv(sports, here("Goodplot-badplot", "Data", "sports.csv"))
+```
+
+### The third step is cleaning up the data
+
+I wanted to highlight the budgets from the year 2019 since that is the most recent year in the data set. I also chose to focus on Men's Tennis because I play tennis!
+
+```{r}
+tennis_college <- sports |>
+  filter(year == "2019", # Choosen year
+         sports == "Tennis", # Tennis only
+         classification_name == "NCAA Division I-FBS", # Select for Division
+         exp_men > 1050000, # This is cut off for top 20 expenses
+         !is.na(exp_men)) |> # Get rid of NA values in expenses
+  mutate(exp_men = as.numeric(exp_men)) |> # Change to numeric
+  arrange(desc(exp_men)) # Order from highest to lowest
+
+```
+
+As a part of cleaning up the data, I noticed that the exp_men column was not written as a dollar amount. I created a new column that adds the dollar sign and "," as the digital group separator to each exp_men value.
+
+```{r}
+tennis_college <- tennis_college |>
+  mutate(exp_men_price = label_dollar(prefix = "$ ", big.mark = ",")(exp_men)) # Adding new column: 1000 would become $ 1,000
+```
+
+I also wanted to make the names of the colleges easier to read. I adjusted the names of the top 20 schools in Men's Tennis expenses to their more commonly used name.
+
+```{r}
+##### Adjust College Names #####
+
+tennis_college$institution_name[tennis_college$institution_name == "Baylor University"] <- "Baylor"
+tennis_college$institution_name[tennis_college$institution_name == "Texas Christian University"] <- "TCU"
+tennis_college$institution_name[tennis_college$institution_name == "University of Louisville"] <- "Louisville"
+tennis_college$institution_name[tennis_college$institution_name == "Texas A & M University-College Station"] <- "Texas A&M"
+tennis_college$institution_name[tennis_college$institution_name == "Wake Forest University"] <- "Wake Forest"
+tennis_college$institution_name[tennis_college$institution_name == "Ohio State University-Main Campus"] <- "Ohio State"
+tennis_college$institution_name[tennis_college$institution_name == "University of Oklahoma-Norman Campus"] <- "Oklahoma"
+tennis_college$institution_name[tennis_college$institution_name == "University of Florida"] <- "Florida"
+tennis_college$institution_name[tennis_college$institution_name == "University of California-Los Angeles"] <- "UCLA"
+tennis_college$institution_name[tennis_college$institution_name == "University of Southern California"] <- "USC"
+tennis_college$institution_name[tennis_college$institution_name == "Southern Methodist University"] <- "SMU"
+tennis_college$institution_name[tennis_college$institution_name == "The University of Texas at Austin"] <- "Texas"
+tennis_college$institution_name[tennis_college$institution_name == "Auburn University"] <- "Auburn"
+tennis_college$institution_name[tennis_college$institution_name == "Clemson University"] <- "Clemson"
+tennis_college$institution_name[tennis_college$institution_name == "University of Michigan-Ann Arbor"] <- "Michigan"
+tennis_college$institution_name[tennis_college$institution_name == "Louisiana State University and Agricultural & Mechanical College"] <- "LSU"
+tennis_college$institution_name[tennis_college$institution_name == "Vanderbilt University"] <- "Vanderbilt"
+tennis_college$institution_name[tennis_college$institution_name == "University of Illinois at Urbana-Champaign"] <- "Illinois"
+tennis_college$institution_name[tennis_college$institution_name == "University of Georgia"] <- "Georgia"
+tennis_college$institution_name[tennis_college$institution_name == "University of Notre Dame"] <- "Notre Dame"
+```
+
+I didn't know if there was a shorter way to do this so had to go one by one!
+
+### After I cleaned up all the data, I could make my bad plot.
+
+```{r}
+#| label: fig-bad-plot
+#| fig-cap: "tenns Collage budget Sport 10 1-FCS"
+#| fig-cap-location: bottom
+#| out-width: "100%"
+#| fig-width: 11
+#| fig-height: 8
+#| fig-align: "center"
+
+bad_mten_budget <- ggplot(data = tennis_college,
+                           mapping = aes(x = institution_name,
+                                         y = exp_men)) +
+  geom_col(width = 5, fill = "#4A412A", color = "#CFFF04", linewidth = 5) + # Ugly color choices
+  geom_text(aes(label = exp_men_price), hjust = -0.2, size = 10, color = "#ff3503") + # Adding labels to each bar in the graph
+  scale_y_reverse(
+    breaks = seq(0, 2000000, by = 500000), # Flipping the graph upside down, reversing the y axis 
+    expand = expansion(mult = c(0, .5)) # Creating space between top of graph and where bars start
+  ) +
+  labs(title = "Budgat College tenns sportt 10 1-FBS",
+       x = "Dolla dolla bills yall", y = "Institution of higher education where people go to learn about stuff",
+       caption = "Source: Equity in Athletics Data Analysis"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "#00FF00", color = "black", linewidth = 10),
+    panel.background = element_rect(fill = "#4A412A"), # Adding background color here
+    panel.grid.major = element_line(color = "#FF0000", linewidth = 4), # Changing major gridlines 
+    panel.grid.minor = element_line(color = "#FFFF00", linewidth = 10), # Changing minor gridlines
+    plot.title = element_text(size = 60, hjust = .5, face = "bold"),
+    plot.subtitle = element_text(size = 15, hjust = .5),
+    plot.caption = element_text(vjust = -2), 
+    axis.title.x = element_text(size = 24, face = "bold", vjust = -1.5),
+    axis.title.y = element_text(size = 16),
+    axis.text.x = element_text(size = 2),
+    axis.text.y = element_text(size = 20, hjust = 1, face = "italic")
+  )
+
+bad_mten_budget
+
+ggsave(here("Goodplot-badplot", "Outputs", "fig-bad-plot.png"), width = 11, height = 8)
+```
+
+#### Some of the bad plotting practices include:
+
+- Is it clear?
+
+  - The title does not clearly identify what the plot is displaying and there are spelling mistakes
+
+  - The x and y axis titles are unclear, do not include units, and are not formatted the same. They are also on the wrong axes
+
+- Does it communicate data responsibly?
+
+  - The border of the graph cuts off the plot title and axis titles
+
+  - The size of the title is way too large and the axis titles sizes and boldness are inconsistent
+
+  - The X axis labels are too small
+
+  - The graph is flipped upside down and there is a lot of empty space above \$0. Scaled incorrectly
+
+- Does it look awesome?
+
+  - The colors do not work well together, lots of neon and that brown is supposedly the ugliest color according to google
+
+    - Not color blind friendly either
+
+  - There is no context given what is shown in the graph
+
+  - Major and minor grid lines are too large, not equal, different colors, and too many of them in general
+
+  - Argument to be made that it looks awesome
+
+  - Bars are overlapping, impossible differentiate which school they represent
+
+### Now that the bad plot is done, we can try to make a good plot!
+
+While the data is ready to be plotted, I wanted to enhance how the good plot would look by creating a color scale that attached each college to their primary color. That is done in the code below.
+
+```{r}
+##### Create Color Scale #####
+
+college_colors <- scale_fill_manual(values = c(
+  "Baylor" = "#154734",
+  "TCU" = "#4D1979",
+  "Louisville" = "#AD0000",
+  "Texas A&M" = "#500000",
+  "Wake Forest" = "#9E7E38",
+  "Ohio State" = "#BA0C2F",
+  "Oklahoma" = "#841617",
+  "Florida" = "#0021A5",
+  "UCLA" = "#2D68C4",
+  "USC" = "#990000",
+  "SMU" = "#354CA1",
+  "Texas" = "#BF5700",
+  "Auburn"= "#002B49",
+  "Clemson" = "#F56600",
+  "Michigan" = "#FFCB05",
+  "LSU" = "#461D7C",
+  "Vanderbilt" = "#CFAE70",
+  "Illinois" = "#FF5F05",
+  "Georgia" = "#BA0C2F",
+  "Notre Dame" = "#0C2340"
+))
+```
+
+### Now here is my good plot!
+
+```{r}
+#| label: fig-good-plot
+#| fig-cap: "The Top 20 Expenses of Men's Tennis Teams for Division 1-FBS Schools"
+#| fig-cap-location: bottom
+#| out-width: "100%"
+#| fig-width: 13
+#| fig-height: 9
+#| fig-align: "center"
+
+plot_mten_budget <- ggplot(data = tennis_college,
+                            mapping = aes(x = exp_men,
+                                          y = reorder(institution_name, exp_men),
+                                          fill = institution_name)) +
+  geom_col(width = .8) +
+  college_colors + # This, with fill = institution_name sets the bar color to each colleges primary color 
+  geom_text(aes(label = exp_men_price), hjust = -0.2, size = 4) + # Adding labels to end of bars to see what each value is specifically
+  scale_x_continuous(breaks = seq(0, 2000000, by = 500000), expand = expansion(mult = c(0, .3)), labels = label_number(prefix = "$", big.mark = ",")) + # Making sure the labels have the right formatting, changing x axis scale and creating more space on the right side of the graph
+  labs(title = "The Top 20 Expenses of Men's Tennis Teams for Division 1-FBS Schools in 2019",
+       x = "Men's Tennis Expenses ($)", y = "Institution Name",
+       caption = "Source: Equity in Athletics Data Analysis"
+  ) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(size = 20, hjust = .5, face = "bold"),
+    plot.subtitle = element_text(size = 15, hjust = .5),
+    plot.caption = element_text(vjust = -1),
+    axis.title.x = element_text(size = 16, face = "bold", vjust = -1.5),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    axis.text.x = element_text(size = 12, vjust = -1),
+    axis.text.y = element_text(size = 12, hjust = 1, margin = margin(r = 5)),
+    axis.ticks.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    legend.position = "none"
+  )
+
+plot_mten_budget
+
+ggsave(here("Goodplot-badplot", "Outputs", "fig-good-plot.png"), width = 13, height = 9)
+```
+
+#### Some reasons why this is a good plot:
+
+- Is it clear?
+
+  - No grammatical errors, title accurately describes the plot, not too large
+
+  - Axes include units when needed, clearly defined labels
+
+  - In descending order so that the highest expense is at the top going down
+
+  - Added bar labels to get the specific expenses value
+
+- Does it communicate data responsibly?
+
+  - Adequate use of space, no overlapping labels
+
+  - Consistent size, boldness, fonts
+
+  - Graph is horizontal to ensure y axis labels are readable and not overcrowded.
+
+- Does it look awesome?
+
+  - Colors of the bar represent the primary color of each college
+
+  - Bars spaced properly, space in between to more easily differentiate between each school
+
+### That is all. Thanks for viewing!

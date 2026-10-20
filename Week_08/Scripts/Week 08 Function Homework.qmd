@@ -15,9 +15,9 @@ execute:
 theme: zephyr
 ---
 
-## For this week, I created two functions. One converts British Pounds to US Dollars and the other plots data on the cost of Cappuccinos with the wage of baristas.  
+## For this week, I created two functions. One converts British Pounds to US Dollars and the other plots data on the cost of Cappuccinos with the wage of baristas.
 
-### The first step is loading in the libraries 
+### The first step is loading in the libraries
 
 ```{r}
 ### Load in Libraries #####
@@ -148,4 +148,4 @@ ggsave(here("Week_08", "Outputs", "HW08-fig-coffee-USD.png"), width = 10, height
 
 As you can see, there is a relatively weak positive relationship between the two. I'd expect that in places where the hourly wage is higher, the price of a small cappuccino would be higher. That's kind of what we see.
 
-### Thanks for viewing! 
+### Thanks for viewing!
