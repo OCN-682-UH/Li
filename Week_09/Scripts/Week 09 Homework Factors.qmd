@@ -1,0 +1,101 @@
+---
+title: "Week_09 Factors Homework"
+author: "Timothy Li"
+date: "`r Sys.Date()`"
+format:
+  html:
+    code-fold: true
+    code-summary: Show Code
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  eval: true
+theme: zephyr
+---
+
+# Today we are going to be practicing using factors and graphing intertidal data!
+
+### The first step is loading in our libraries
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor) # This will help clean up the column names
+```
+
+### The next critical step is reading in our data
+
+```{r}
+intertidal <- read_csv(here("Week_09", "Data", "intertidaldata.csv"))
+
+intertidaldata_latitude <- read_csv(here("Week_09", "Data", "intertidaldata_latitude.csv"))
+
+intertidal_data_dictionary <- read_csv(here("Week_09", "Data", "intertidal_data_dictionary.csv"))
+```
+
+As you'll notice, I loaded in all three csv files but for the sake of this assignment, I will only be using the intertidal data set and not the latitude intertidal data set.
+
+### The third step is cleaning up the data
+
+```{r}
+cleaned_intertidal <- intertidal |>
+  clean_names() |>
+  mutate(quadrat = str_remove(quadrat, "\\s*[.1]+$")) |> # This gets rid of the two unique input names "Low ." and "Mid 1" and replaces with just "Low" and "Mid" --> Had to google the specific symbols, not sure if there is another way to do this
+  mutate(quadrat = factor(quadrat, levels = c("Low", "Mid", "High")),  
+         site = factor(site))
+
+cleaned_intertidal
+```
+
+### The fourth step is summarizing the bare rock percent cover statistics during differing tide heights for each site
+
+```{r}
+summary_by_site <- cleaned_intertidal |>
+  group_by(site, quadrat) |> # Grouping for site and tide height
+  summarise(
+    mean_cover = mean(bare_rock, na.rm = TRUE), # Mean % cover only for Bare Rock
+    .groups = "drop" # Removing groupings structures so left with dataframe
+  )
+
+summary_by_site
+```
+
+### The final step is graphing these summary statistics
+
+```{r}
+#| label: fig-barerock-cover
+#| fig-cap: "Percent Cover (%) of Bare Rock During Various Tide Levels at Each Location"
+#| fig-cap-location: bottom
+#| out-width: "90%"
+#| fig-width: 8
+#| fig-height: 6
+#| fig-align: "center"
+
+summary_by_site |>
+  ggplot(aes(x = quadrat, y = mean_cover,
+             group = site,
+             color = fct_reorder2(site, quadrat, mean_cover))) + # Reordering site by % cover values at max quadrat (High)
+  geom_line(size = .75) + 
+  geom_point(alpha = .75) +
+  scale_y_continuous( # Added this to help identify the value of each point
+    breaks = seq(0, 100, 10), 
+    minor_breaks = seq(0, 100, 5) # Adds minor gridlines 
+  ) +
+  labs(x = "Tide Level", y = "Average Percent Cover (%) of Bare Rock",
+       caption = "Data provided by Professor Silbiger",
+       color = "Site"
+  ) + 
+  theme_bw() +
+  theme(
+    axis.title.x = element_text(size = 12, face = "bold", vjust = -1),
+    axis.title.y = element_text(size = 12, face = "bold", vjust = 2),
+    plot.caption = element_text(size = 5),
+    axis.text.x = element_text(size = 11),
+    axis.text.y = element_text(size = 11),
+    legend.text = element_text(size = 11),  
+    legend.title = element_text(size = 12, face = "bold")
+  )
+  
+```
