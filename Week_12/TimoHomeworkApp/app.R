@@ -11,13 +11,10 @@ library(here)
 
 
 ##### Read in Data #####
-cafe <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2026/2026-09-08/cafe.csv")
+cafe <- read.csv(here("Week_12", "TimoHomeworkApp", "Data", "cafe.csv"))
 
-# cafe <- read.csv(here("Week_12", "TimoHomeworkApp", "Data", "cafe.csv"))
-# cafe <- read.csv("Week_12/TimoHomeworkApp/Data/cafe.csv")
-# I'm not sure why these kept giving me errors saying that no file or directory exists
-# so I loaded in the data directly from github
-
+# cafe <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2026/2026-09-08/cafe.csv")
+# Cafe data from github 
 
 ##### Define UI #####
 ui <- fluidPage(
