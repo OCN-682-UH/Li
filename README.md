@@ -27,6 +27,10 @@
 
 [Factors Homework](https://01a17a97-d388-754b-fcd4-322c053476c3.share.connect.posit.cloud)
 
+* [Week 12](Week_12)
+
+[Shiny App Homework](https://01a1eadd-1cb1-4665-000c-2f1e2dbc6834.share.connect.posit.cloud)
+
 **About Me**
 
 My name is Timothy Li and I'm a 2nd year Masters student in Natural Resources and Environmental Management. I use RStudio as a part of my research studying cost-effective monitoring techniques for rice production in Hawai'i!
