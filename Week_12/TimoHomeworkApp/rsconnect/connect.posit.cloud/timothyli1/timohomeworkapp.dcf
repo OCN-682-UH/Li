@@ -1,0 +1,12 @@
+name: timohomeworkapp
+title: TimoHomeworkApp
+username: timothyli1
+account: timothyli1
+server: connect.posit.cloud
+hostUrl: https://api.connect.posit.cloud/v1
+appId: 01a1eadd-1cb1-4665-000c-2f1e2dbc6834
+bundleId:
+url: https://connect.posit.cloud/timothyli1/content/01a1eadd-1cb1-4665-000c-2f1e2dbc6834
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
