@@ -15,7 +15,7 @@ execute:
 theme: zephyr
 ---
 
-## For this week, I'm practicing using for loops and map functions on tide pool data by Jenn Fields. 
+## For this week, I'm practicing using for loops and map functions on tide pool data by Jenn Fields.
 
 ### As always we need to start by loading in our libraries
 
@@ -26,7 +26,7 @@ library(tidyverse)
 library(here)
 ```
 
-## For Loop Section: 
+## For Loop Section:
 
 ### The first step is reading in our data and listing the files in a directory
 
@@ -76,7 +76,7 @@ TP_data
 ### The last step is creating plots using a for loop
 
 ```{r}
-#### Create a Plot #####
+##### Create a Plot #####
 
 file_names <- dir(path = TP_Path, pattern = ".csv") # Just the file names
 
@@ -106,11 +106,13 @@ for (i in seq_along(file_names)) {
 }
 ```
 
-## Now for the Map Function Method: 
+## Now for the Map Function Method:
 
 ### The first step is to bring in the files using purrr
 
 ```{r}
+##### Read in Data and List Files #####
+
 TP_Path <- here("Week_13", "Data", "TP_Data")
 
 files <- dir(path = TP_Path, pattern = ".csv", full.names = TRUE) # saves the entire path
@@ -138,6 +140,7 @@ data
 ### The final step is creating a plot using purrr
 
 ```{r}
+##### Create a Plot #####
 
 file_names <- dir(path = TP_Path, pattern = ".csv") # just the file names
 
@@ -167,4 +170,4 @@ save_temp_plot <- function(file_name) {
 walk(file_names, save_temp_plot)
 ```
 
-#### The outputs folder should have all the graphs! 
+#### The outputs folder should have all the graphs!
