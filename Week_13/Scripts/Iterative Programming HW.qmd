@@ -1,0 +1,170 @@
+---
+title: "Iterative Programming Homework"
+author: "Timothy Li"
+date: "`r Sys.Date()`"
+format:
+  html:
+    code-fold: true
+    code-summary: Show Code
+    embed-resources: true
+editor: visual
+execute:
+  warning: false
+  message: false
+  eval: true
+theme: zephyr
+---
+
+## For this week, I'm practicing using for loops and map functions on tide pool data by Jenn Fields. 
+
+### As always we need to start by loading in our libraries
+
+```{r}
+##### Load Libraries #####
+
+library(tidyverse)
+library(here)
+```
+
+## For Loop Section: 
+
+### The first step is reading in our data and listing the files in a directory
+
+```{r}
+##### Read in Data and List Files #####
+
+TP_Path <- here("Week_13", "Data", "TP_data")
+
+# List all files in that path matching a pattern (here, anything with .csv)
+# You can use regex to be more specific about filenames
+files <- dir(path = TP_Path, pattern = ".csv", full.names = TRUE)
+
+files
+
+```
+
+### The second step is pre-allocating space for the loop
+
+```{r}
+##### Pre-allocate Space for Loop #####
+
+TP_data <- tibble(filename = rep(NA, length(files)), 
+                    mean_temp = rep(NA, length(files)), # Column for mean temp
+                    mean_light = rep(NA, length(files))) # Colum for mean light intensity 
+
+TP_data # rows = # of files
+```
+
+### The third step is creating the loop
+
+```{r}
+##### Creating the Loop #####
+
+for (i in seq_along(files)) { # loop over each file i times
+  
+  raw_data <- read_csv(files[i]) 
+  
+  TP_data$filename[i] <- files[i] # Add file name to file name column
+  TP_data$mean_temp[i] <- mean(raw_data$Temp.C, na.rm = TRUE) # Add this value to the mean temp column
+  TP_data$mean_light[i] <- mean(raw_data$Intensity.lux, na.rm = TRUE) # Add this value to the mean light tensity column
+   
+}
+
+TP_data
+```
+
+### The last step is creating plots using a for loop
+
+```{r}
+#### Create a Plot #####
+
+file_names <- dir(path = TP_Path, pattern = ".csv") # Just the file names
+
+for (i in seq_along(file_names)) {
+  
+  raw_data <- read_csv(paste0(TP_Path, "/", file_names[i]))
+  
+  site_name <- str_remove(file_names[i], "\\.csv") # drop ".csv" for the title
+  
+  p <- raw_data |>
+    mutate( # Adjust the Date.Time column to be properly formatted
+      DateTime = mdy_hm(Date.Time)) |>
+    ggplot(aes(x = DateTime, y = Temp.C)) +
+    geom_line(alpha = .75, color = "#56B4E9") + # Color Blind Friendly 
+    labs(title = paste0("Time Series of Temperature (°C) from ", site_name), x = "Date", y = "Temperature (°C)") +
+    theme_bw() +
+    theme(
+      plot.title = element_text(face = "bold"),
+      axis.title.x = element_text(size = 12, face = "bold", vjust = -1),
+      axis.title.y = element_text(size = 12, face = "bold", vjust = 2),
+      axis.text.x = element_text(size = 10),
+      axis.text.y = element_text(size = 10)
+    )
+  
+  ggsave(here("Week_13", "Outputs", paste0(site_name, " Temp.Plot.png")), # Ex: TP1 Temp.Plot.png
+         plot = p, width = 6, height = 4)
+}
+```
+
+## Now for the Map Function Method: 
+
+### The first step is to bring in the files using purrr
+
+```{r}
+TP_Path <- here("Week_13", "Data", "TP_Data")
+
+files <- dir(path = TP_Path, pattern = ".csv", full.names = TRUE) # saves the entire path
+
+files
+```
+
+### The second step is creating the list and calculating the means
+
+```{r}
+##### Create List and Calculate Means #####
+
+data <- files |>
+  set_names() |> # names each list element with its file name
+  map(read_csv) |> # a list of 3 dataframes
+  list_rbind(names_to = "filename") |> # stack them; list names go in a "filename" column
+  group_by(filename) |>
+  summarise(mean_temp = mean(Temp.C, na.rm = TRUE),
+            mean_light = mean(Intensity.lux, na.rm = TRUE))
+
+data
+
+```
+
+### The final step is creating a plot using purrr
+
+```{r}
+
+file_names <- dir(path = TP_Path, pattern = ".csv") # just the file names
+
+save_temp_plot <- function(file_name) {
+  site_name <- str_remove(file_name, "\\.csv") # drop ".csv" for the title
+  
+  p <- read_csv(paste0(TP_Path, "/", file_name)) |>
+    mutate(
+      DateTime = mdy_hm(Date.Time)) |> # Adjust the Date.Time column to be properly formatted
+    ggplot(aes(x = DateTime, y = Intensity.lux)) +
+    geom_line(alpha = .75, color = "#D55E00") +
+    labs(title = paste0("Time Series of Light Intensity (lux) from ", site_name), x = "Date", y = "Intensity (lux)") +
+    theme_bw() +
+    theme(
+      plot.title = element_text(face = "bold"),
+      axis.title.x = element_text(size = 12, face = "bold", vjust = -1),
+      axis.title.y = element_text(size = 12, face = "bold", vjust = 2),
+      axis.text.x = element_text(size = 10),
+      axis.text.y = element_text(size = 10)
+    )
+  
+  
+  ggsave(here("Week_13", "Outputs", paste0(site_name, " Intensity.Plot.png")),
+         plot = p, width = 6, height = 4)
+}
+
+walk(file_names, save_temp_plot)
+```
+
+#### The outputs folder should have all the graphs! 
